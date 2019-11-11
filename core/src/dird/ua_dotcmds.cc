@@ -460,6 +460,7 @@ bool DotBvfsRestoreCmd(UaContext* ua, const char* cmd)
  * .bvfs_lsfiles jobid=1,2,3,4 pathid=10
  */
 bool DotBvfsLsfilesCmd(UaContext* ua, const char* cmd)
+// maik: das kommt von der CLI
 {
   int i;
   DBId_t pathid = 0;
@@ -479,6 +480,12 @@ bool DotBvfsLsfilesCmd(UaContext* ua, const char* cmd)
   }
 
   if ((i = FindArgWithValue(ua, "pattern")) >= 0) { pattern = ua->argv[i]; }
+
+  /*
+     if ((i = FindArgWithValue(ua, "clientid")) >= 0) {
+        clientid = ua->argv[i]; // noch int raus machen, vgl. BvfsValidateJobids
+     }
+  */
 
   if (!ua->guid) { ua->guid = new_guid_list(); }
 

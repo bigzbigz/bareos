@@ -77,10 +77,11 @@ class BareosDbQueryEnum {
     list_joblog_count_1 = 70,
     get_orphaned_paths_0 = 71,
     get_bad_paths_0 = 72,
-    bvfs_ls_special_dirs_3 = 73,
-    bvfs_ls_sub_dirs_5 = 74,
+    bvfs_ls_special_dirs_4 = 73,
+    bvfs_ls_sub_dirs_7 = 74,
     list_volumes_select_0 = 75,
     list_volumes_select_long_0 = 76,
-    SQL_QUERY_NUMBER = 77
+    batch_insert_file_table_1 = 77,
+    SQL_QUERY_NUMBER = 78
   };
 };

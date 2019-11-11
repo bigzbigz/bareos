@@ -234,12 +234,13 @@ bool BareosDb::UpdatePathHierarchyCache(JobControlRecord* jcr,
   Mmsg(cmd,
        "INSERT INTO PathVisibility (PathId, JobId) "
        "SELECT DISTINCT PathId, JobId "
-       "FROM (SELECT PathId, JobId FROM File WHERE JobId = %s "
+       "FROM (SELECT PathId, JobId FROM File WHERE JobId = %s AND ClientId = "
+       "client_of_job (%s) "
        "UNION "
        "SELECT PathId, BaseFiles.JobId "
        "FROM BaseFiles JOIN File AS F USING (FileId) "
-       "WHERE BaseFiles.JobId = %s) AS B",
-       jobid, jobid);
+       "WHERE ClientId = client_of_job (%s) AND BaseFiles.JobId = %s) AS B",
+       jobid, jobid, jobid, jobid);
 
   if (!QUERY_DB(jcr, cmd)) {
     Dmsg1(dbglevel, "Can't fill PathVisibility %d\n", (uint32_t)JobId);
@@ -438,7 +439,8 @@ Bvfs::Bvfs(JobControlRecord* j, BareosDb* mdb)
   jobids = GetPoolMemory(PM_NAME);
   prev_dir = GetPoolMemory(PM_NAME);
   pattern = GetPoolMemory(PM_NAME);
-  *jobids = *prev_dir = *pattern = 0;
+  clientname = GetPoolMemory(PM_NAME);
+  *jobids = *prev_dir = *pattern = *clientname = 0;
   pwd_id = 0;
   see_copies = false;
   see_all_versions = false;
@@ -454,6 +456,7 @@ Bvfs::~Bvfs()
   FreePoolMemory(jobids);
   FreePoolMemory(pattern);
   FreePoolMemory(prev_dir);
+  FreePoolMemory(clientname);
   FreeAttr(attr);
   jcr->DecUseCount();
 }
@@ -648,14 +651,15 @@ bool Bvfs::ls_dirs()
    */
   *prev_dir = 0;
 
-  db->FillQuery(special_dirs_query, BareosDb::SQL_QUERY::bvfs_ls_special_dirs_3,
-                pathid, pathid, jobids);
+  db->FillQuery(special_dirs_query, BareosDb::SQL_QUERY::bvfs_ls_special_dirs_4,
+                pathid, pathid, jcr->client_name, jobids);
 
   if (*pattern) {
     db->FillQuery(filter, BareosDb::SQL_QUERY::match_query, pattern);
   }
-  db->FillQuery(sub_dirs_query, BareosDb::SQL_QUERY::bvfs_ls_sub_dirs_5, pathid,
-                jobids, jobids, filter.c_str(), jobids);
+  db->FillQuery(sub_dirs_query, BareosDb::SQL_QUERY::bvfs_ls_sub_dirs_7, pathid,
+                jobids, jobids, jcr->client_name, filter.c_str(),
+                jcr->client_name);
 
   db->FillQuery(union_query, BareosDb::SQL_QUERY::bvfs_lsdirs_4,
                 special_dirs_query.c_str(), sub_dirs_query.c_str(), limit,
@@ -677,8 +681,10 @@ static void build_ls_files_query(JobControlRecord* jcr,
                                  int64_t offset)
 {
   if (db->GetTypeIndex() == SQL_TYPE_POSTGRESQL) {
+    // maik: query kopieren und mit clientname/id neu machen // verify!
     db->FillQuery(query, BareosDb::SQL_QUERY::bvfs_list_files, JobId, PathId,
-                  JobId, PathId, filter, limit, offset);
+                  jcr->client_name, JobId, PathId, jcr->client_name, filter,
+                  limit, offset);
   } else {
     db->FillQuery(query, BareosDb::SQL_QUERY::bvfs_list_files, JobId, PathId,
                   JobId, PathId, limit, offset, filter, JobId, JobId);

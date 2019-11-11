@@ -855,15 +855,22 @@ bool BareosDb::WriteBatchFileRecords(JobControlRecord* jcr)
 
   /* clang-format off */
   if (!jcr->db_batch->SqlQuery(
-        "INSERT INTO File (FileIndex, JobId, PathId, Name, LStat, MD5, DeltaSeq, Fhinfo, Fhnode) "
+        "INSERT INTO File (FileIndex, JobId, PathId, Name, LStat, MD5, DeltaSeq, Fhinfo, Fhnode, ClientId) "
         "SELECT batch.FileIndex, batch.JobId, Path.PathId, "
-        "batch.Name, batch.LStat, batch.MD5, batch.DeltaSeq, batch.Fhinfo, batch.Fhnode "
+        "batch.Name, batch.LStat, batch.MD5, batch.DeltaSeq, batch.Fhinfo, batch.Fhnode, client_of_job(batch.JobId) "
         "FROM batch "
         "JOIN Path ON (batch.Path = Path.Path) ")) {
      Jmsg1(jcr, M_FATAL, 0, "Fill File table %s\n", errmsg);
      goto bail_out;
   }
   /* clang-format on */
+
+  /*
+     if (!jcr->db_batch->SqlQuery(SQL_QUERY_batch_insert_file_table_1,
+     jcr->ClientId)) { Jmsg1(jcr, M_FATAL, 0, "Fill File table %s\n", errmsg);
+        goto bail_out;
+     }
+  */
 
   jcr->JobStatus = JobStatus; /* reset entry status */
   Jmsg(jcr, M_INFO, 0, "Insert of attributes batch table done\n");
@@ -990,11 +997,11 @@ bool BareosDb::CreateFileRecord(JobControlRecord* jcr, AttributesDbRecord* ar)
   /* clang-format off */
   Mmsg(cmd,
        "INSERT INTO File (FileIndex,JobId,PathId,Name,"
-       "LStat,MD5,DeltaSeq,Fhinfo,Fhnode) VALUES (%u,%u,%u,'%s','%s','%s',%u,%llu,%llu)",
-       ar->FileIndex, ar->JobId, ar->PathId, esc_name,
-       ar->attr, digest, ar->DeltaSeq, ar->Fhinfo, ar->Fhnode);
+       "LStat,MD5,DeltaSeq,Fhinfo,Fhnode, ClientId) VALUES "
+       "(%u,%u,%u,'%s','%s','%s',%u,%llu,%llu,%u)",
+       ar->FileIndex, ar->JobId, ar->PathId, esc_name, ar->attr, digest,
+       ar->DeltaSeq, ar->Fhinfo, ar->Fhnode, ar->ClientId);
   /* clang-format on */
-
   ar->FileId = SqlInsertAutokeyRecord(cmd, NT_("File"));
   if (ar->FileId == 0) {
     Mmsg2(errmsg, _("Create db File record %s failed. ERR=%s"), cmd,
