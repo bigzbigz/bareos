@@ -249,8 +249,7 @@ bool SetupJob(JobControlRecord* jcr, bool suppress_output)
     if (jcr->impl->res.job->storage) {
       CopyRwstorage(jcr, jcr->impl->res.job->storage, _("Job resource"));
     } else {
-      CopyRwstorage(jcr, jcr->impl->res.job->pool->storage,
-                    _("Pool resource"));
+      CopyRwstorage(jcr, jcr->impl->res.job->pool->storage, _("Pool resource"));
     }
   }
 
@@ -1409,6 +1408,7 @@ bool GetOrCreateClientRecord(JobControlRecord* jcr)
   }
   Dmsg2(100, "Created Client %s record %d\n",
         jcr->impl->res.client->resource_name_, jcr->impl->jr.ClientId);
+  jcr->ClientId = jcr->impl->jr.ClientId;
   return true;
 }
 
@@ -1623,9 +1623,7 @@ void DirdFreeJcr(JobControlRecord* jcr)
     jcr->db = NULL;
   }
 
-  if (jcr->impl->restore_tree_root) {
-    FreeTree(jcr->impl->restore_tree_root);
-  }
+  if (jcr->impl->restore_tree_root) { FreeTree(jcr->impl->restore_tree_root); }
 
   if (jcr->impl->bsr) {
     libbareos::FreeBsr(jcr->impl->bsr);
