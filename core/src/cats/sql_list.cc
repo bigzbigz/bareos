@@ -704,7 +704,7 @@ void BareosDb::ListFilesForJob(JobControlRecord* jcr,
     Mmsg(cmd,
          "SELECT Path.Path||Name AS Filename "
          "FROM (SELECT PathId, Name FROM File WHERE JobId=%s AND "
-         "ClientId=client_of_job (%s) "
+         "ClientId=%u "
          "UNION ALL "
          "SELECT PathId, Name "
          "FROM BaseFiles JOIN File "
@@ -712,7 +712,7 @@ void BareosDb::ListFilesForJob(JobControlRecord* jcr,
          "WHERE BaseFiles.JobId = %s"
          ") AS F, Path "
          "WHERE Path.PathId=F.PathId",
-         edit_int64(jobid, ed1), ed1, ed1);
+         edit_int64(jobid, ed1), jcr->ClientId, ed1);
   }
 
   sendit->ArrayStart("filenames");
