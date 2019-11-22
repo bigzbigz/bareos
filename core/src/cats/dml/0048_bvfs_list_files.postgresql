@@ -23,7 +23,7 @@ FROM (
       FROM File
       WHERE JobId IN (%s)
         AND PathId = %s
-        AND ClientId = clientid_of_clientname ('%s')
+        AND ClientId = %s
         UNION ALL
         SELECT File.FileId,
                File.JobId,
@@ -39,7 +39,7 @@ FROM (
    JOIN Job USING (JobId)
    WHERE
       FileName != ''
-      AND ClientId = clientid_of_clientname ('%s')
+      AND ClientId = %s
       %s
    ORDER BY FileName,
             StartTime DESC

@@ -38,7 +38,8 @@ FROM
             Fhinfo,
             Fhnode
      FROM BaseFiles
-     JOIN File USING (FileId) WHERE BaseFiles.JobId IN (%s) ) AS T
+     JOIN File ON (BaseFiles.FileId = File.FileId AND File.ClientId = %s)
+     WHERE BaseFiles.JobId IN (%s) ) AS T
 JOIN Job USING (JobId)
 ORDER BY Name,
          PathId,

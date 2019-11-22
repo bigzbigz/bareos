@@ -364,7 +364,9 @@ bool BareosDb::BvfsUpdatePathHierarchyCache(JobControlRecord* jcr, char* jobids)
       goto bail_out;
     }
 
-    Dmsg1(dbglevel, "Updating cache for %lld\n", (uint64_t)JobId);
+    jcr->ClientId = GetClientIdFromJobId(jcr, JobId);
+    Dmsg1(dbglevel, "Updating cache for %lld ClientId %ld\n", (uint64_t)JobId,
+          jcr->ClientId);
     if (!UpdatePathHierarchyCache(jcr, ppathid_cache, JobId)) {
       retval = false;
     }
@@ -634,6 +636,8 @@ int Bvfs::_handlePath(void* ctx, int fields, char** row)
 bool Bvfs::ls_dirs()
 {
   char pathid[50];
+  char clientid[50];
+  DBId_t client_id = 0;
   PoolMem special_dirs_query(PM_MESSAGE);
   PoolMem filter(PM_MESSAGE);
   PoolMem sub_dirs_query(PM_MESSAGE);
@@ -643,8 +647,12 @@ bool Bvfs::ls_dirs()
 
   if (*jobids == 0) { return false; }
 
-  /* convert pathid to string */
+  client_id = db->GetClientIdFromJobIdList(jcr, jobids);
+  if (client_id == 0) { return false; }
+
+  /* convert pathid and client_id to string */
   edit_uint64(pwd_id, pathid);
+  edit_uint64(client_id, clientid);
 
   /*
    * The sql query displays same directory multiple time, take the first one
@@ -652,14 +660,13 @@ bool Bvfs::ls_dirs()
   *prev_dir = 0;
 
   db->FillQuery(special_dirs_query, BareosDb::SQL_QUERY::bvfs_ls_special_dirs_4,
-                pathid, pathid, jcr->client_name, jobids);
+                pathid, pathid, clientid, jobids);
 
   if (*pattern) {
     db->FillQuery(filter, BareosDb::SQL_QUERY::match_query, pattern);
   }
   db->FillQuery(sub_dirs_query, BareosDb::SQL_QUERY::bvfs_ls_sub_dirs_7, pathid,
-                jobids, jobids, jcr->client_name, filter.c_str(),
-                jcr->client_name);
+                jobids, jobids, clientid, filter.c_str(), clientid, jobids);
 
   db->FillQuery(union_query, BareosDb::SQL_QUERY::bvfs_lsdirs_4,
                 special_dirs_query.c_str(), sub_dirs_query.c_str(), limit,
@@ -675,6 +682,7 @@ static void build_ls_files_query(JobControlRecord* jcr,
                                  BareosDb* db,
                                  PoolMem& query,
                                  const char* JobId,
+                                 const char* ClientId,
                                  const char* PathId,
                                  const char* filter,
                                  int64_t limit,
@@ -683,8 +691,7 @@ static void build_ls_files_query(JobControlRecord* jcr,
   if (db->GetTypeIndex() == SQL_TYPE_POSTGRESQL) {
     // maik: query kopieren und mit clientname/id neu machen // verify!
     db->FillQuery(query, BareosDb::SQL_QUERY::bvfs_list_files, JobId, PathId,
-                  jcr->client_name, JobId, PathId, jcr->client_name, filter,
-                  limit, offset);
+                  ClientId, JobId, PathId, ClientId, filter, limit, offset);
   } else {
     db->FillQuery(query, BareosDb::SQL_QUERY::bvfs_list_files, JobId, PathId,
                   JobId, PathId, limit, offset, filter, JobId, JobId);
@@ -697,21 +704,30 @@ static void build_ls_files_query(JobControlRecord* jcr,
 bool Bvfs::ls_files()
 {
   char pathid[50];
+  char clientid[50];
+  DBId_t client_id = 0;
   PoolMem filter(PM_MESSAGE);
   PoolMem query(PM_MESSAGE);
 
   Dmsg1(dbglevel, "ls_files(%lld)\n", (uint64_t)pwd_id);
   if (*jobids == 0) { return false; }
 
+  client_id = db->GetClientIdFromJobIdList(jcr, jobids);
+  if (client_id == 0) { return false; }
+
+
   if (!pwd_id) { ChDir(get_root()); }
 
+  /* convert pathid and client_id to string */
   edit_uint64(pwd_id, pathid);
+  edit_uint64(client_id, clientid);
+
   if (*pattern) {
     db->FillQuery(filter, BareosDb::SQL_QUERY::match_query2, pattern);
   }
 
-  build_ls_files_query(jcr, db, query, jobids, pathid, filter.c_str(), limit,
-                       offset);
+  build_ls_files_query(jcr, db, query, jobids, clientid, pathid, filter.c_str(),
+                       limit, offset);
   nb_record = db->BvfsBuildLsFileQuery(query, list_entries, user_data);
 
   return nb_record == limit;

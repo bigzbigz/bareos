@@ -683,6 +683,8 @@ void BareosDb::ListFilesForJob(JobControlRecord* jcr,
   char ed1[50];
   ListContext lctx(jcr, this, sendit, NF_LIST);
 
+  jcr->ClientId = GetClientIdFromJobId(jcr, jobid);
+
   DbLock(this);
 
   /*

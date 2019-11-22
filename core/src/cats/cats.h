@@ -795,6 +795,8 @@ class BareosDb : public BareosDbQueryEnum {
   int GetNumPoolRecords(JobControlRecord* jcr);
   int GetPoolIds(JobControlRecord* jcr, int* num_ids, DBId_t** ids);
   bool GetClientIds(JobControlRecord* jcr, int* num_ids, DBId_t** ids);
+  DBId_t GetClientIdFromJobId(JobControlRecord* jcr, JobId_t JobId);
+  DBId_t GetClientIdFromJobIdList(JobControlRecord* jcr, const char* jobids);
   int GetStorageIds(JobControlRecord* jcr, int* num_ids, DBId_t** ids);
   bool PrepareMediaSqlQuery(JobControlRecord* jcr,
                             MediaDbRecord* mr,

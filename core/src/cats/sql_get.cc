@@ -597,6 +597,77 @@ bool BareosDb::GetClientIds(JobControlRecord* jcr, int* num_ids, DBId_t* ids[])
 }
 
 /**
+ * This function returns the Client Id for a given JobId
+ *
+ * Returns 0: on failure
+ *         ClientId: on success
+ */
+DBId_t BareosDb::GetClientIdFromJobId(JobControlRecord* jcr, JobId_t JobId)
+{
+  SQL_ROW row;
+  int num_ids = 0;
+  char ed1[50];
+  DBId_t client_id = 0;
+
+  DbLock(this);
+  Mmsg(cmd, "SELECT ClientId FROM Job WHERE JobId = %s",
+       edit_int64(JobId, ed1));
+  if (QUERY_DB(jcr, cmd)) {
+    num_ids = SqlNumRows();
+    if (num_ids > 0) {
+      if ((row = SqlFetchRow()) && row[0]) {
+        client_id = str_to_uint64(row[0]);
+      }
+    }
+    SqlFreeResult();
+  } else {
+    Mmsg(errmsg, _("GetClientIdFromJobId select failed: ERR=%s\n"),
+         sql_strerror());
+    Jmsg(jcr, M_ERROR, 0, "%s", errmsg);
+  }
+  DbUnlock(this);
+  return client_id;
+}
+
+/**
+ * This function returns the Client Id for a given list of JobIds
+ *
+ * Returns 0: on failure (empty result, or multiple client Ids found)
+ *         ClientId: on success
+ */
+DBId_t BareosDb::GetClientIdFromJobIdList(JobControlRecord* jcr,
+                                          const char* jobids)
+{
+  SQL_ROW row;
+  int num_ids = 0;
+  DBId_t client_id = 0;
+
+  DbLock(this);
+  Mmsg(cmd, "SELECT DISTINCT ClientId FROM Job WHERE JobId IN (%s)", jobids);
+  if (QUERY_DB(jcr, cmd)) {
+    num_ids = SqlNumRows();
+    if (num_ids == 1) {
+      if ((row = SqlFetchRow()) && row[0]) {
+        client_id = str_to_uint64(row[0]);
+      }
+    } else if (num_ids > 1) {
+      Mmsg(errmsg,
+           _("GetClientIdFromJobIdList ERROR: Found multiple ClientIDs for "
+             "JobIds %s\n"),
+           jobids);
+    }
+    SqlFreeResult();
+  } else {
+    Mmsg(errmsg, _("GetClientIdFromJobIdList select failed: ERR=%s\n"),
+         sql_strerror());
+    Jmsg(jcr, M_ERROR, 0, "%s", errmsg);
+  }
+  DbUnlock(this);
+  return client_id;
+}
+
+
+/**
  * Get Pool Record
  * If the PoolId is non-zero, we get its record,
  * otherwise, we search on the PoolName
@@ -1256,6 +1327,8 @@ bool BareosDb::GetFileList(JobControlRecord* jcr,
                            DB_RESULT_HANDLER* ResultHandler,
                            void* ctx)
 {
+  DBId_t client_id = 0;
+  char clientid[50];
   PoolMem query(PM_MESSAGE);
   PoolMem query2(PM_MESSAGE);
 
@@ -1266,12 +1339,18 @@ bool BareosDb::GetFileList(JobControlRecord* jcr,
     return false;
   }
 
+  client_id = GetClientIdFromJobIdList(jcr, jobids);
+  if (client_id == 0) { return false; }
+
+  /* convert client_id to string */
+  edit_uint64(client_id, clientid);
+
   if (use_delta) {
     FillQuery(query2, SQL_QUERY::select_recent_version_with_basejob_and_delta,
-              jobids, jobids, jobids, jobids);
+              clientid, jobids, clientid, jobids);
   } else {
-    FillQuery(query2, SQL_QUERY::select_recent_version_with_basejob, jobids,
-              jobids, jobids, jobids);
+    FillQuery(query2, SQL_QUERY::select_recent_version_with_basejob, clientid,
+              jobids, clientid, jobids);
   }
 
   /*

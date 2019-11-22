@@ -26,7 +26,7 @@ LEFT JOIN (
     SELECT PathId, JobId, LStat, FileId
     FROM File
     WHERE File.Name = ''
-      AND ClientId = clientid_of_clientname ('%s')
+      AND ClientId = '%s'
       AND File.JobId IN (%s)
 ) AS DirAttribute
 ON (SpecialDir.PathId = DirAttribute.PathId)
