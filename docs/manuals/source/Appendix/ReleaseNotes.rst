@@ -490,12 +490,37 @@ This release contains several enhancements. Excerpt:
 Bareos-16.2
 -----------
 
+.. _bareos-16.2.9:
+
+bareos-16.2.9
+~~~~~~~~~~~~~
+
+:index:`\ <single: bareos-16.2.9; Release Notes>`\
+
+================ ===============================================
+Code Release     tdb
+Database Version 2004 (unchanged)
+Release Ticket
+Url              http://download.bareos.com/bareos/release/16.2/
+================ ===============================================
+
+-  Improve list command
+
+   -  Honor "pool" filter for jobs so you can list jobs by pool
+
+-  Updated MySQL creation schema to current standards
+
+-  Packaging: Use .tar.bz2 instead of tar.gz
+
+-  Packaging: Make rpm spec compatible to docker builds
+
+
 .. _bareos-16.2.8:
 
 bareos-16.2.8
 ~~~~~~~~~~~~~
 
-:index:`\ <single: bareos-16.2.8; Release Notes>`\ 
+:index:`\ <single: bareos-16.2.8; Release Notes>`\
 
 ================ ===============================================
 Code Release     2018-07-06
