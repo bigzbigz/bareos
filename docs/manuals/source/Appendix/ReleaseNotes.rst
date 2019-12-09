@@ -20,10 +20,83 @@ The overview about new feature of a release are shown at the :ref:`genindex` of 
 
 .. _bareos-1826-releasenotes:
 
-.. _bareos-18.2.6:
+
+.. _bareos-1827-releasenotes:
+
+.. _bareos-18.2.7:
 
 Bareos-18.2
 -----------
+
+Bareos-18.2.7
+~~~~~~~~~~~~~
+
+General Information
+^^^^^^^^^^^^^^^^^^^
+
+.. list-table:: Bareos 18.2.7 Release Information
+   :header-rows: 0
+   :widths: auto
+
+   * - **Release Date**
+     - 1 December 2019
+   * - **Database Version**
+     -  2171
+   * - **URL**
+     - https://download.bareos.com/bareos/release/18.2/
+..
+   * - **Release Ticket**
+     - :issue:`1040`
+..
+   * - **LOC**
+     - 123456+ 12345-
+
+.. csv-table:: binary package availablility in the `bareos.com subscription repos <https://www.bareos.com/en/Subscription.html>`_
+   :header: "Distribution", "Architecture"
+   :widths: auto
+
+   CentOS_6, "x86_64"
+   CentOS_7, "x86_64"
+   Debian_8.0, "i586,x86_64"
+   Debian_9.0, "i586,x86_64"
+   Fedora_28, "x86_64"
+   Fedora_29, "x86_64"
+   FreeBSD_11.2, "x86_64"
+   MacOS, "x86_64"
+   RHEL_6, "x86_64"
+   RHEL_7, "x86_64"
+   SLE_12_SP3, "x86_64"
+   SLE_12_SP4, "x86_64"
+   SLE_15, "x86_64"
+   openSUSE_Leap_15.0, "x86_64"
+   Univention_4.3, "x86_64"
+   Windows, "32Bit, 64Bit"
+   xUbuntu_14.04, "i586,x86_64"
+   xUbuntu_16.04, "i586,x86_64"
+   xUbuntu_18.04, "x86_64"
+
+Bugfixes and Changes
+^^^^^^^^^^^^^^^^^^^^
+* :ticket:`990`: SD sometimes tries to load empty tape slot
+* :ticket:`1030`: bscan does not work for migration and copy jobs
+* :ticket:`1056`: NDMP restore on 16.2.5 and above does not fill NDMP environment correctly
+* :ticket:`1058`: 18.2.6 build error while cmake don't build the correct dependency's
+* :ticket:`1059`: Webui spams Apache error_log with bconsole messages
+* :ticket:`1072`: Newer versions of Fedora use stricter code checking
+* :ticket:`1095`: webui: when login as a user without the permission to the ".api" command, the webui show a wrong and ugly error message
+* :ticket:`1100`: bconsole crashes when a pam authentication aborts
+* :ticket:`1112`: After mount/unmount of tape "status slots" shows empty list
+* All daemons: fix buffer overrun in PathAppend
+* |dir|: add support for MySQL 8
+* |dir|: Fix nullptr cornercase in mtx-changer parser
+* |webui|: Fix overflowing top navigation bar content hiding tab navigation in some modules
+* |webui|: Fix always active debug messages in error.log
+* |webui|: Bvfs cache update notification added
+* Documentation: various improvements and updates
+
+.. _bareos-1826-releasenotes:
+
+.. _bareos-18.2.6:
 
 Bareos-18.2.6
 ~~~~~~~~~~~~~
