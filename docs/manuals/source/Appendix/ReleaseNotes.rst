@@ -303,12 +303,43 @@ Internal Project Changes
 Bareos-17.2
 -----------
 
+.. _bareos-17.2.8:
+
+bareos-17.2.8
+~~~~~~~~~~~~~
+
+:index:`\ <single: bareos-17.2.8; Release Notes>`\
+
+================ ===============================================
+Code Release     tdb
+Database Version 2171 (unchanged)
+Release Ticket
+Url              http://download.bareos.com/bareos/release/17.2/
+================ ===============================================
+
+-  Droplet: improves handling when truncating volumes
+
+   -  Without this change, errors when truncating a droplet volume are silently ignored.
+
+-  :ticket:`1030`  bscan does not work for migration and copy jobs
+
+-  :ticket:`1034`: Read error on tape may be misinterpreted as end-of-tape.
+
+-  Fix nullptr cornercase in mtx-changer parser in the |dir|
+
+-  Fix corner-case crash during job cancel in the |sd|
+
+-  Fix crash on excessive SOS records
+
+-  Packaging: make specfiles compatible to docker
+
+
 .. _bareos-17.2.7:
 
 bareos-17.2.7
 ~~~~~~~~~~~~~
 
-:index:`\ <single: bareos-17.2.7; Release Notes>`\ 
+:index:`\ <single: bareos-17.2.7; Release Notes>`\
 
 ================ ===============================================
 Code Release     2018-07-13
