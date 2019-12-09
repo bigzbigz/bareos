@@ -82,9 +82,10 @@ file(GLOB SQLFILES
 )
 foreach(SQLFILE ${SQLFILES})
   get_filename_component(BASENAME ${SQLFILE} NAME)
-  string(
-    REGEX MATCH "[0-9]*_([0-9]*)" DUMMMY ${SQLFILE}
-  ) # match the regex, we only are interested in submatch in parentheses
+  string(REGEX MATCH "[0-9]*_([0-9]*)" DUMMMY ${SQLFILE}) # match the regex, we
+                                                          # only are interested
+                                                          # in submatch in
+                                                          # parentheses
   set(VERSION ${CMAKE_MATCH_1})
   install(
     FILES ${SQLFILE}
@@ -128,9 +129,10 @@ file(GLOB SQLFILES
 )
 foreach(SQLFILE ${SQLFILES})
   get_filename_component(BASENAME ${SQLFILE} NAME)
-  string(
-    REGEX MATCH "[0-9]*_([0-9]*)" DUMMMY ${SQLFILE}
-  ) # match the regex, we only are interested in submatch in parentheses
+  string(REGEX MATCH "[0-9]*_([0-9]*)" DUMMMY ${SQLFILE}) # match the regex, we
+                                                          # only are interested
+                                                          # in submatch in
+                                                          # parentheses
   set(VERSION ${CMAKE_MATCH_1})
 
   file(STRINGS ${SQLFILE} SQLFILE_LINE)
@@ -177,9 +179,10 @@ file(GLOB SQLFILES
 )
 foreach(SQLFILE ${SQLFILES})
   get_filename_component(BASENAME ${SQLFILE} NAME)
-  string(
-    REGEX MATCH "[0-9]*_([0-9]*)" DUMMMY ${SQLFILE}
-  ) # match the regex, we only are interested in submatch in parentheses
+  string(REGEX MATCH "[0-9]*_([0-9]*)" DUMMMY ${SQLFILE}) # match the regex, we
+                                                          # only are interested
+                                                          # in submatch in
+                                                          # parentheses
   set(VERSION ${CMAKE_MATCH_1})
   install(
     FILES ${SQLFILE}
