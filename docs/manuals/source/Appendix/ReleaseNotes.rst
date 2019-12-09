@@ -18,7 +18,124 @@ The overview about new feature of a release are shown at the :ref:`genindex` of 
 
 .. _bareos-current-releasenotes:
 
-.. _bareos-1826-releasenotes:
+.. _bareos-1924-releasenotes:
+
+.. _bareos-19.2.4:
+
+Bareos-19.2
+-----------
+
+Bareos-19.2.4~rc1
+~~~~~~~~~~~~~~~~~
+
+General Information
+^^^^^^^^^^^^^^^^^^^
+
+.. list-table:: Bareos 19.2.4 Release Information
+   :header-rows: 0
+   :widths: auto
+
+   * - **Release Date**
+     - 1 December 2019
+   * - **Database Version**
+     -  2192
+   * - **URL**
+     - https://download.bareos.com/bareos/release/19.2/
+   * -
+     - https://download.bareos.org/bareos/release/19.2/
+..
+   * - **Release Ticket**
+     - :issue:`0000`
+..
+   * - **LOC**
+     - 123456+ 12345-
+
+.. csv-table:: binary package availablility in the `bareos.com subscription repos <https://www.bareos.com/en/Subscription.html>`_
+   :header: "Distribution", "Architecture"
+   :widths: auto
+
+   CentOS_6, "x86_64"
+   CentOS_7, "x86_64"
+   Debian_8.0, "i586,x86_64"
+   Debian_9.0, "i586,x86_64"
+   Fedora_28, "x86_64"
+   Fedora_29, "x86_64"
+   FreeBSD_11.2, "x86_64"
+   MacOS, "x86_64"
+   RHEL_6, "x86_64"
+   RHEL_7, "x86_64"
+   SLE_12_SP3, "x86_64"
+   SLE_12_SP4, "x86_64"
+   SLE_15, "x86_64"
+   openSUSE_Leap_15.0, "x86_64"
+   Univention_4.3, "x86_64"
+   Windows, "32Bit, 64Bit"
+   xUbuntu_14.04, "i586,x86_64"
+   xUbuntu_16.04, "i586,x86_64"
+   xUbuntu_18.04, "x86_64"
+
+New Features
+^^^^^^^^^^^^
+* |webui|: :ref:`section-webui-restore` a specific file version
+* Display a summary before performing a restore in the |webui|
+* New configuration parameter *filetree_refresh_timeout* has been added to configuration.ini file of the |webui| to set a custom timeout while refreshing the file tree (.bvfs_cache_update) in the restore module (:ref:`section-updating-bvfs-cache-frequently`)
+* Configuration: :ref:`DirectorResourceUser` for pam authentication
+* Configuration: : Simplified :ref:`StorageResourceMultipliedDevice` Storage Configuration
+* Client initiated connection: Run dedicated jobs when a client connects to the |dir|. Introduced a new configuration directive RunOnIncomingConnectInterval, see the documentation here: :config:option:`dir/job/RunOnIncomingConnectInterval`
+* python-bareos: Depending on the distribution, the Python module is packaged for Python 2 and/or Python 3. Previously is has only been packaged for Python 2.
+* python-bareos: There are two variants of the Console protocol. The protocol used before Bareos-18.2 and the protocol used thereafter. The protocol since Bareos-18.2 supports TLS-PSK and PAM authentication, see :ref:`bareos-18.2.5`. Beginning with this version, python-bareos also supports both protocols. As TLS-PSK for Python (module **sslpsk**) is not available for all platform, python-bareos has integrated an automatic fallback to the old protocol.
+
+Changed Features
+^^^^^^^^^^^^^^^^
+* Improved Command ACL handling and error messages in the |webui|
+* Restricted console profile examples for limited and read-only purposes have been added to the |webui| package
+* Updated |webui| localization
+* Configuration: Do not allow empty passwords for mandatory passwords
+* All daemons: Generate a log message if extended attributes are disabled automatically
+* All daemons: replace crc32 implementation with a faster one
+* |dir|: Add support for MySQL 8
+* PAM authentication requires a *User* configuration resource. Previously *Console* and *User* resources could be used.
+* The *User* configuration resource changed.  Previously it has been an alias to the *Console* resource, which requires a password and allows some additional options. Now it only consists of a Name and ACL definitions, see :ref:`Configuration/Director.html:user-resource`.
+
+Deprecated and Removed Features
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* |webui|: Functionality of pre-selecting a backup client in the restore module has been removed
+
+Bugs Fixed
+^^^^^^^^^^
+* :ticket:`385`: bareos daemon stop restart hang if bareos-tray-monitor is connected
+* :ticket:`975`: .bvfs\_lsdirs limit offset command parameters do not work properly
+* :ticket:`1004`: Very high cpu usage on Debian stretch
+* :ticket:`1034`: Read error on tape may be misinterpreted as end-of-tape
+* :ticket:`1045`: webui login problem
+* :ticket:`1049`: Translation in German webUI
+* :ticket:`1064`: bconsole crashes after 5 minutes in restore operation due to forgotten watchdog
+* :ticket:`1073`: pthread\_detach for FreeBSD (PR169)
+* :ticket:`1091`: NDMP to NDMP Copy Job Fails
+* :ticket:`1123`: Director can crash during TwoWay Authentication
+* Fix Application Controller Plugin in the |webui| - CommandACLPlugin
+* Fix buffer overrun in function PathAppend
+* Fix nullptr cornercase in mtx-changer parser
+* See :ref:`bareos-18.2.7` for more bugfixes
+
+Updated Documentation
+^^^^^^^^^^^^^^^^^^^^^
+* :ref:`section-updating-bvfs-cache-frequently`
+* |webui| Command ACL Requirements: :ref:`section-webui-command-acl-requirements`
+* |webui| Access Control Configuration: :ref:`section-webui-access-control-configuration`
+* |webui| Restore: :ref:`section-webui-restore`
+* Developer Guide: :ref:`section-dev-webui-command-usage-in-modules`
+* Documentation: Add message diagrams for backup, restore and verify
+* Documentation: Correct configuration expamles and rewrite several feature introductions
+* Documentation: Improve documentation of postgresql database schema and add diagrams
+
+Internal Project Changes
+^^^^^^^^^^^^^^^^^^^^^^^^
+* All daemons: Smartalloc has been removed from the sourcecode
+* All daemons: Removed many compiler warnings
+* All daemons: Refactored scheduler, threadlist, configuration parser and recently used job-list code to be more robust and testable
+* Documentation: Merge new documentation-source structure for Sphinx-build
+* Removed PHP Warnings and Notices, JS and CSS errors
 
 
 .. _bareos-1827-releasenotes:
