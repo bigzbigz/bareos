@@ -194,7 +194,7 @@ class LowLevel(object):
         client_socket = self.socket
         identity = self.get_tls_psk_identity()
         if isinstance(self.password, Password):
-            password = self.password.md5()
+            password = self.password.md5().encode('utf-8')
         else:
             raise bareos.exceptions.ConnectionError(u"No password provided.")
         self.logger.debug("identity = {0}, password = {1}".format(identity, password))
@@ -216,7 +216,7 @@ class LowLevel(object):
         """Bareos TLS-PSK excepts the identiy is a specific format."""
         return u"{0}{1}{2}".format(
             self.identity_prefix, Constants.record_separator, str(self.name)
-        )
+        ).encode("utf-8")
 
     @staticmethod
     def is_tls_psk_available():
